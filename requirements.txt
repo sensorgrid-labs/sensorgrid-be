@@ -1,0 +1,5 @@
+Flask[async]>=3.1.0
+SQLAlchemy[asyncio]>=2.0.36
+asyncpg>=0.30.0
+pydantic>=2.10.0
+pytest>=8.3.0

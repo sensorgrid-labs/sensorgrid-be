@@ -55,6 +55,6 @@ pytest
 - `PATCH /api/v1/anomaly-rules/<id>`
 - `GET /api/v1/query-lab`
 
-## 포트폴리오 포인트
+## 프로젝트 포인트
 
 Flask MVC와 SQLAlchemy async 모델로 제조 센서 데이터를 서비스 레이어별로 분리했습니다. 실제 DB 없이도 smoke test가 가능하도록 seeded data를 사용합니다.

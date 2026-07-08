@@ -1,54 +1,60 @@
 # SensorGrid BE
 
-Flask REST API for manufacturing sensor registry, metric ingest, anomaly rules, and query-lab evidence.
+설비/센서 registry, metric ingest, anomaly rule, query lab을 제공하는 Flask REST API입니다.
 
-## Stack
+## 주요 기능
 
-- Flask REST controllers
-- MVC-ish modules: `controllers`, `services`, `models`, `repositories`
-- SQLAlchemy 2.0 async models for PostgreSQL/TimescaleDB schema shape
-- Seeded service data so local smoke checks run without Postgres
+- 로그인/refresh 인증
+- 설비 목록과 센서 조회
+- metric ingest
+- 센서 metric time-range 조회
+- anomaly event/rule 조회와 생성/수정
+- query lab 데이터 제공
 
-## API
+## 기술 스택
 
-- `POST /api/v1/auth/signin`
-- `POST /api/v1/auth/refresh`
-- `GET /api/v1/machines`
-- `GET /api/v1/sensors?machineId=`
-- `POST /api/v1/metrics/ingest`
-- `GET /api/v1/sensors/<id>/metrics?from=&to=&bucket=`
-- `GET /api/v1/anomaly-events?status=`
-- `GET /api/v1/anomaly-rules`
-- `POST /api/v1/anomaly-rules`
-- `PATCH /api/v1/anomaly-rules/<id>`
-- `GET /api/v1/query-lab`
+- Flask
+- MVC 구조: controllers, services, models, repositories
+- SQLAlchemy 2.0 Async Mode 모델
+- PostgreSQL/TimescaleDB schema intent
+- seeded local data
 
-## Local
+## 실행
 
 ```bash
 python3 -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt
 python -m app.main
+```
+
+API:
+
+```text
+http://localhost:5002
+```
+
+## 검증
+
+```bash
+python -m compileall app tests
 pytest
 ```
 
-API runs on `http://localhost:5002`.
+## API
 
-## TimescaleDB schema intent
+- `POST /api/v1/auth/signin`
+- `POST /api/v1/auth/refresh`
+- `GET /api/v1/machines`
+- `GET /api/v1/sensors`
+- `POST /api/v1/metrics/ingest`
+- `GET /api/v1/sensors/<id>/metrics`
+- `GET /api/v1/anomaly-events`
+- `GET /api/v1/anomaly-rules`
+- `POST /api/v1/anomaly-rules`
+- `PATCH /api/v1/anomaly-rules/<id>`
+- `GET /api/v1/query-lab`
 
-`sensor_metrics` is modeled as the TSDB table:
+## 포트폴리오 포인트
 
-```sql
-SELECT create_hypertable('sensor_metrics', 'time');
-CREATE INDEX idx_sensor_metrics_sensor_time ON sensor_metrics(sensor_id, time DESC);
-```
-
-`/api/v1/query-lab` exposes the portfolio comparison:
-
-- raw PostgreSQL time-range scan over `200,000` points
-- TimescaleDB `time_bucket` + sensor/time index plan
-
-## Limitation
-
-Persistence is scaffolded, not required for local verification. Services use seeded data until `DATABASE_URL` and migrations are wired.
+Flask MVC와 SQLAlchemy async 모델로 제조 센서 데이터를 서비스 레이어별로 분리했습니다. 실제 DB 없이도 smoke test가 가능하도록 seeded data를 사용합니다.

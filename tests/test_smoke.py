@@ -36,3 +36,19 @@ def test_query_lab_documents_timescale_improvement():
     assert response.status_code == 200
     assert raw["durationMs"] > optimized["durationMs"]
     assert "time_bucket" in " ".join(optimized["explain"])
+
+
+def test_rule_create_and_sensor_metrics():
+    app = create_app()
+    client = app.test_client()
+
+    rule = client.post(
+        "/api/v1/anomaly-rules",
+        json={"sensorId": "s-vib-cnc-07", "metricKey": "spindle_vibration", "operator": "gt", "threshold": 5.4},
+    )
+    assert rule.status_code == 201
+    assert rule.get_json()["sensorId"] == "s-vib-cnc-07"
+
+    metrics = client.get("/api/v1/sensors/s-vib-cnc-07/metrics?bucket=2m")
+    assert metrics.status_code == 200
+    assert len(metrics.get_json()) == 36
